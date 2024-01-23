@@ -14,6 +14,5 @@ class DataFile(Base):
     end_date = Column(Date, nullable=False)
     status = Column(String, nullable=False, index=True)
     location = Column(String, nullable=True)
-    is_public = Column(Boolean, default=False, index=True)
 
 
