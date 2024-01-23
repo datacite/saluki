@@ -1,6 +1,6 @@
-from ..enums import DataFileType
+from ..enums import DataFileType, DataFileStatus
 from ..dependencies.database import Base
-from sqlalchemy import Column, Integer, String, Boolean, Text, Date, Enum
+from sqlalchemy import Column, Integer, String, Text, Date, Enum
 
 
 class DataFile(Base):
@@ -12,7 +12,10 @@ class DataFile(Base):
     record_count = Column(Integer, nullable=False, default=0)
     start_date = Column(Date, nullable=False)
     end_date = Column(Date, nullable=False)
-    status = Column(String, nullable=False, index=True)
+    status = Column(Enum(DataFileStatus), nullable=False, index=True)
     location = Column(String, nullable=True)
 
-
+    @property
+    def download_link(self):
+        """Generate a download link for the data file."""
+        return self.location  # Temporary - replace with AWS SDK call later on
