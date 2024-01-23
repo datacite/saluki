@@ -1,0 +1,24 @@
+[tool.poetry]
+name = "saluki"
+version = "0.0.1"
+description = "DataCite Data Files Service"
+authors = ["Mike Bennett <mbennett@datacite.org>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+flask = "^3.0.1"
+fastapi = "^0.109.0"
+ujson = "^5.9.0"
+uvicorn = "^0.27.0"
+email-validator = "^2.1.0.post1"
+sqlalchemy = "^2.0.25"
+alembic = "^1.13.1"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^7.2.0"
+black = "^22.12.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
