@@ -27,8 +27,8 @@ class DBDataFile(Base):
         return self.location  # Temporary - replace with AWS SDK call later on
 
 
-def list_datafiles(*, db: Session) -> list[DBDataFile]:
-    return db.query(DBDataFile).all()
+def list_datafiles(*, db: Session, skip: int = 0, limit: int = 100) -> list[DBDataFile]:
+    return db.query(DBDataFile).offset(skip).limit(limit).all()
 
 
 def list_datafile(*, db: Session, slug: str) -> DBDataFile:
