@@ -1,4 +1,4 @@
-from ..enums import UserLevel
+from saluki.enums import UserLevel
 from typing import Optional
 from pydantic import BaseModel, EmailStr
 
@@ -22,7 +22,7 @@ class UserUpdate(UserBase):
 # Extra properties stored in DB
 class UserInDB(UserBase):
     id: int
-    hashed_password: str
+    password: str
     user_level: UserLevel
     is_active: bool
 

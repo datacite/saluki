@@ -3,8 +3,10 @@ from ..dependencies.database import Base
 from sqlalchemy import Column, Integer, String, Text, Date, Enum
 
 
-class DataFile(Base):
+class DBDataFile(Base):
     """Represents a data file."""
+    __tablename__ = "datafiles"
+
     id = Column(Integer, primary_key=True)
     slug = Column(String, nullable=False, index=True)
     description = Column(Text, nullable=False)
