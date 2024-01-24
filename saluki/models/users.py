@@ -4,6 +4,7 @@ from sqlalchemy import Column, Integer, String, Boolean, Enum
 from sqlalchemy.orm import Session
 from passlib.context import CryptContext
 from saluki.schemas.users import UserCreate, UserUpdate
+from sqlalchemy.exc import SQLAlchemyError
 
 password_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -25,6 +26,14 @@ class DBUser(Base):
 
     def verify_password(self, password):
         return password_context.verify(password, self.password)
+
+
+def list_users(*, db: Session, skip: int = 0, limit: int = 100) -> list[DBUser]:
+    return db.query(DBUser).offset(skip).limit(limit).all()
+
+
+def list_user(*, db: Session, email: str) -> DBUser | None:
+    return get_user_by_email(db=db, email=email)
 
 
 def create_user(*, db: Session, user_dict: UserCreate) -> DBUser:
@@ -49,9 +58,12 @@ def update_user(*, db: Session, user: DBUser, user_dict: UserUpdate) -> DBUser:
 
 
 def remove_user(*, db: Session, user: DBUser) -> bool:
-    db.delete(user)
-    db.commit()
-    return True
+    try:
+        db.delete(user)
+        db.commit()
+        return True
+    except SQLAlchemyError as e:
+        return False
 
 
 def get_user_by_email(*, db: Session, email: str) -> DBUser | None:
