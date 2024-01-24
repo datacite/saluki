@@ -24,3 +24,9 @@ class DataFileStatus(Enum):
     generating = "Generating"
     hidden = "Hidden"
     deleted = "Deleted"
+
+
+class PermissionType(Enum):
+    """The type of permission."""
+    filetype = "filetype"
+    datafile = "datafile"

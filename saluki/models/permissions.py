@@ -2,9 +2,11 @@ from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 
 from . import DBDataFile
-from ..enums import DataFileType
+from ..enums import DataFileType, PermissionType
 from ..dependencies.database import Base
 from sqlalchemy import Column, Integer, Enum, ForeignKey
+
+from ..schemas.permissions import DataFileTypePermission, DataFilePermission
 
 
 class DBDataFilePermission(Base):
@@ -23,6 +25,17 @@ class DBDataFileTypePermission(Base):
     data_file_type = Column(Enum(DataFileType), primary_key=True)
 
 
+def get_permission_by_id_and_type(*, db: Session, permission_id: int, permission_type: PermissionType) -> DBDataFileTypePermission | DBDataFilePermission:
+    if permission_type == PermissionType.filetype:
+        return db.query(DBDataFileTypePermission).filter(
+            DBDataFileTypePermission.id == permission_id
+        ).first()
+    else:
+        return db.query(DBDataFilePermission).filter(
+            DBDataFilePermission.id == permission_id
+        ).first()
+
+
 def list_permissions_for_user(*, db: Session, user_id: int, skip: int = 0, limit: int = 100) -> list[DBDataFileTypePermission | DBDataFilePermission]:
     return db.query(DBDataFileTypePermission, DBDataFilePermission).filter(
         DBDataFileTypePermission.user_id == user_id,
@@ -37,14 +50,18 @@ def list_permissions_for_datafile(*, db: Session, datafile_id: int, skip: int = 
     ).offset(skip).limit(limit).all()
 
 
-def create_permission(*, db: Session, permission: DBDataFileTypePermission | DBDataFilePermission) -> DBDataFileTypePermission | DBDataFilePermission:
+def create_permission(*, db: Session, permission_dict: DataFileTypePermission | DataFilePermission) -> DBDataFileTypePermission | DBDataFilePermission:
+    if isinstance(permission_dict, DataFileTypePermission):
+        permission = DBDataFileTypePermission(**permission_dict.model_dump())
+    else:
+        permission = DBDataFilePermission(**permission_dict.model_dump())
     db.add(permission)
     db.commit()
     db.refresh(permission)
     return permission
 
 
-def remove_permission(*, db: Session, permission: DBDataFileTypePermission | DBDataFilePermission) -> bool:
+def remove_permission(*, db: Session, permission: DataFileTypePermission | DataFilePermission) -> bool:
     try:
         db.delete(permission)
         db.commit()
