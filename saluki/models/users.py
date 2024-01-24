@@ -3,7 +3,7 @@ from saluki.enums import UserLevel
 from sqlalchemy import Column, Integer, String, Boolean, Enum
 from sqlalchemy.orm import Session
 from passlib.context import CryptContext
-from saluki.schemas.users import UserCreate
+from saluki.schemas.users import UserCreate, UserUpdate
 
 password_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -37,10 +37,11 @@ def create_user(*, db: Session, user_dict: UserCreate) -> DBUser:
     return user
 
 
-def update_user(*, db: Session, user: DBUser, user_dict: UserCreate) -> DBUser:
+def update_user(*, db: Session, user: DBUser, user_dict: UserUpdate) -> DBUser:
     user.name = user_dict.name
     user.email = user_dict.email
-    user.set_password(user_dict.password)
+    if user_dict.password:
+        user.set_password(user_dict.password)
 
     db.commit()
     db.refresh(user)
