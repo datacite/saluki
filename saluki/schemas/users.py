@@ -1,6 +1,8 @@
-from saluki.enums import UserLevel
 from typing import Optional
+
 from pydantic import BaseModel, EmailStr
+
+from saluki.enums import UserLevel
 
 
 # Shared properties

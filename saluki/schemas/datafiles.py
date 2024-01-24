@@ -1,8 +1,9 @@
 import datetime
 from typing import Optional
-from pydantic import BaseModel, AnyUrl
 
-from ..enums import DataFileType, DataFileStatus
+from pydantic import AnyUrl, BaseModel
+
+from ..enums import DataFileStatus, DataFileType
 
 
 # Shared properties

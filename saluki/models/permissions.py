@@ -1,12 +1,11 @@
+from sqlalchemy import Column, Enum, ForeignKey, Integer
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 
-from . import DBDataFile
-from ..enums import DataFileType, PermissionType
 from ..dependencies.database import Base
-from sqlalchemy import Column, Integer, Enum, ForeignKey
-
-from ..schemas.permissions import DataFileTypePermission, DataFilePermission
+from ..enums import DataFileType, PermissionType
+from ..schemas.permissions import DataFilePermission, DataFileTypePermission
+from . import DBDataFile
 
 
 class DBDataFilePermission(Base):

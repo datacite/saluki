@@ -1,9 +1,8 @@
+from sqlalchemy import Column, Date, Enum, Integer, String, Text
 from sqlalchemy.orm import Session
 
-from saluki.enums import DataFileType, DataFileStatus
 from saluki.dependencies.database import Base
-from sqlalchemy import Column, Integer, String, Text, Date, Enum
-
+from saluki.enums import DataFileStatus, DataFileType
 from saluki.schemas.datafiles import DataFileCreate, DataFileUpdate
 
 

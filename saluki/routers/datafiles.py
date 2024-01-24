@@ -1,18 +1,19 @@
 from fastapi import APIRouter, Depends, HTTPException, status
+
+from saluki.dependencies.database import get_database
 from saluki.models.datafiles import (
     create_datafile,
-    update_datafile,
-    remove_datafile,
-    list_datafiles,
     list_datafile,
+    list_datafiles,
+    remove_datafile,
+    update_datafile,
 )
 from saluki.schemas.datafiles import (
-    DataFileCreate,
-    DataFileUpdate,
-    DataFileInDB,
     DataFile,
+    DataFileCreate,
+    DataFileInDB,
+    DataFileUpdate,
 )
-from saluki.dependencies.database import get_database
 
 datafile_router = APIRouter(
     prefix="/datafiles",

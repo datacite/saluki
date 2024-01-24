@@ -1,17 +1,16 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 
+from saluki.dependencies.database import get_database
 from saluki.models.users import (
     DBUser,
     create_user,
     get_user_by_email,
-    update_user,
-    remove_user,
-    list_users,
     list_user,
+    list_users,
+    remove_user,
+    update_user,
 )
-from saluki.schemas.users import UserCreate, User, UserInDB, UserUpdate
-from saluki.dependencies.database import get_database
-
+from saluki.schemas.users import User, UserCreate, UserInDB, UserUpdate
 
 user_router = APIRouter(
     prefix="/users",

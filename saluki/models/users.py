@@ -1,10 +1,11 @@
+from passlib.context import CryptContext
+from sqlalchemy import Boolean, Column, Enum, Integer, String
+from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.orm import Session
+
 from saluki.dependencies.database import Base
 from saluki.enums import UserLevel
-from sqlalchemy import Column, Integer, String, Boolean, Enum
-from sqlalchemy.orm import Session
-from passlib.context import CryptContext
 from saluki.schemas.users import UserCreate, UserUpdate
-from sqlalchemy.exc import SQLAlchemyError
 
 password_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
