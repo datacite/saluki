@@ -30,4 +30,3 @@ class UserInDB(UserBase):
 # Extra properties to return via API
 class User(UserBase):
     pass
-
