@@ -2,7 +2,6 @@ from fastapi import APIRouter, Depends, HTTPException, status
 
 from saluki.dependencies.database import get_database
 from saluki.models.users import (
-    DBUser,
     create_user,
     get_user_by_email,
     list_user,

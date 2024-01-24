@@ -2,10 +2,10 @@ from sqlalchemy import Column, Enum, ForeignKey, Integer
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 
-from ..dependencies.database import Base
-from ..enums import DataFileType, PermissionType
-from ..schemas.permissions import DataFilePermission, DataFileTypePermission
-from . import DBDataFile
+from saluki.dependencies.database import Base
+from saluki.enums import DataFileType, PermissionType
+from saluki.models.datafiles import DBDataFile
+from saluki.schemas.permissions import DataFilePermission, DataFileTypePermission
 
 
 class DBDataFilePermission(Base):

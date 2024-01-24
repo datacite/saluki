@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 
-from ..enums import DataFileType
+from saluki.enums import DataFileType
 
 
 class DataFilePermission(BaseModel):

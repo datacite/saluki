@@ -3,7 +3,7 @@ from typing import Optional
 
 from pydantic import AnyUrl, BaseModel
 
-from ..enums import DataFileStatus, DataFileType
+from saluki.enums import DataFileStatus, DataFileType
 
 
 # Shared properties
