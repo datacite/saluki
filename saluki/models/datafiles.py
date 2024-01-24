@@ -20,6 +20,7 @@ class DBDataFile(Base):
     end_date = Column(Date, nullable=False)
     status = Column(Enum(DataFileStatus), nullable=False, index=True)
     location = Column(String, nullable=True)
+    doi = Column(String, nullable=True)
 
     @property
     def download_link(self):
@@ -53,6 +54,7 @@ def update_datafile(
     datafile.end_date = datafile_dict.end_date
     datafile.status = datafile_dict.status
     datafile.location = datafile_dict.location
+    datafile.doi = datafile_dict.doi
 
     db.commit()
     db.refresh(datafile)

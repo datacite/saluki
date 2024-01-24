@@ -15,6 +15,7 @@ class DataFileBase(BaseModel):
     start_date: datetime.date
     end_date: datetime.date
     status: DataFileStatus
+    doi: Optional[str] = None
 
 
 # Extra properties to receive via API on creation
