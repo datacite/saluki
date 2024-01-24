@@ -1,6 +1,10 @@
-from ..enums import DataFileType, DataFileStatus
-from ..dependencies.database import Base
+from sqlalchemy.orm import Session
+
+from saluki.enums import DataFileType, DataFileStatus
+from saluki.dependencies.database import Base
 from sqlalchemy import Column, Integer, String, Text, Date, Enum
+
+from saluki.schemas.datafiles import DataFileCreate, DataFileUpdate
 
 
 class DBDataFile(Base):
@@ -21,3 +25,40 @@ class DBDataFile(Base):
     def download_link(self):
         """Generate a download link for the data file."""
         return self.location  # Temporary - replace with AWS SDK call later on
+
+
+def list_datafiles(*, db: Session) -> list[DBDataFile]:
+    return db.query(DBDataFile).all()
+
+
+def list_datafile(*, db: Session, slug: str) -> DBDataFile:
+    return db.query(DBDataFile).filter(DBDataFile.slug == slug).first()
+
+
+def create_datafile(*, db: Session, datafile_dict: DataFileCreate) -> DBDataFile:
+    datafile = DBDataFile(**datafile_dict.model_dump())
+    db.add(datafile)
+    db.commit()
+    db.refresh(datafile)
+    return datafile
+
+
+def update_datafile(*, db: Session, datafile: DBDataFile, datafile_dict: DataFileUpdate) -> DBDataFile:
+    datafile.description = datafile_dict.description
+    datafile.type = datafile_dict.type
+    datafile.record_count = datafile_dict.record_count
+    datafile.start_date = datafile_dict.start_date
+    datafile.end_date = datafile_dict.end_date
+    datafile.status = datafile_dict.status
+    datafile.location = datafile_dict.location
+
+    db.commit()
+    db.refresh(datafile)
+    return datafile
+
+
+def remove_datafile(*, db: Session, datafile: DBDataFile) -> bool:
+    datafile.status = DataFileStatus.deleted
+    db.commit()
+    return True
+
