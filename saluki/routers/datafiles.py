@@ -30,7 +30,7 @@ def get_datafiles(skip: int = 0, limit: int = 100, db=Depends(get_database)):
     return list_datafiles(db=db, skip=skip, limit=limit)
 
 
-@datafile_router.get("/{datafile_id}", response_model=DataFileInDB)
+@datafile_router.get("/{datafile_id}", response_model=DataFile)
 def get_datafile(datafile_id: str, db=Depends(get_database)):
     db_datafile = list_datafile(db=db, slug=datafile_id)
     if not db_datafile:

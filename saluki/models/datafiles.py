@@ -1,3 +1,4 @@
+from fastapi.encoders import jsonable_encoder
 from sqlalchemy import Column, Date, Enum, Integer, String, Text
 from sqlalchemy.orm import Session
 
@@ -38,6 +39,8 @@ def list_datafile(*, db: Session, slug: str) -> DBDataFile:
 
 def create_datafile(*, db: Session, datafile_dict: DataFileCreate) -> DBDataFile:
     datafile = DBDataFile(**datafile_dict.model_dump())
+    # Force the location to be a string rather than Pydantic's AnyURL type
+    datafile.location = str(datafile.location)
     db.add(datafile)
     db.commit()
     db.refresh(datafile)
@@ -53,7 +56,7 @@ def update_datafile(
     datafile.start_date = datafile_dict.start_date
     datafile.end_date = datafile_dict.end_date
     datafile.status = datafile_dict.status
-    datafile.location = datafile_dict.location
+    datafile.location = str(datafile_dict.location)
     datafile.doi = datafile_dict.doi
 
     db.commit()
