@@ -1,7 +1,7 @@
 from passlib.context import CryptContext
 from sqlalchemy import Boolean, Column, Enum, Integer, String
 from sqlalchemy.exc import SQLAlchemyError
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, relationship
 
 from saluki.dependencies.database import Base
 from saluki.enums import UserLevel
@@ -21,6 +21,13 @@ class DBUser(Base):
     password = Column(String, nullable=False)
     user_level = Column(Enum(UserLevel), nullable=False, default=0)
     is_active = Column(Boolean, default=False)
+
+    datafile_permissions = relationship(
+        "DBDataFilePermission", back_populates="user", cascade="all, delete-orphan"
+    )
+    filetype_permissions = relationship(
+        "DBDataFileTypePermission", back_populates="user", cascade="all, delete-orphan"
+    )
 
     def set_password(self, password):
         self.password = password_context.hash(password)
