@@ -1,6 +1,6 @@
-from sqlalchemy import Column, Enum, ForeignKey, Integer
+from sqlalchemy import Column, Enum, ForeignKey, Integer, union_all
 from sqlalchemy.exc import SQLAlchemyError
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, relationship
 
 from saluki.dependencies.database import Base
 from saluki.enums import DataFileType, PermissionType
@@ -16,6 +16,10 @@ class DBDataFilePermission(Base):
     user_id = Column(Integer, ForeignKey("users.id"), primary_key=True)
     data_file_id = Column(Integer, ForeignKey("datafiles.id"), primary_key=True)
 
+    user = relationship(
+        "DBUser", back_populates="datafile_permissions"
+    )
+
 
 class DBDataFileTypePermission(Base):
     """Allows a user access to a specific type of data file."""
@@ -24,6 +28,10 @@ class DBDataFileTypePermission(Base):
 
     user_id = Column(Integer, ForeignKey("users.id"), primary_key=True)
     data_file_type = Column(Enum(DataFileType), primary_key=True)
+
+    user = relationship(
+        "DBUser", back_populates="filetype_permissions"
+    )
 
 
 def get_permission_by_id_and_type(
@@ -46,32 +54,36 @@ def get_permission_by_id_and_type(
 def list_permissions_for_user(
     *, db: Session, user_id: int, skip: int = 0, limit: int = 100
 ) -> list[DBDataFileTypePermission | DBDataFilePermission]:
-    return (
-        db.query(DBDataFileTypePermission, DBDataFilePermission)
+
+    filetype_perms = (db.query(DBDataFileTypePermission)
         .filter(
             DBDataFileTypePermission.user_id == user_id,
+        )
+    ).all()
+
+    datafile_perms = (db.query(DBDataFilePermission)
+        .filter(
             DBDataFilePermission.user_id == user_id,
         )
-        .offset(skip)
-        .limit(limit)
-        .all()
-    )
+    ).all()
+
+    return filetype_perms + datafile_perms
 
 
 def list_permissions_for_datafile(
     *, db: Session, datafile_id: int, skip: int = 0, limit: int = 100
 ) -> list[DBDataFileTypePermission | DBDataFilePermission]:
-    return (
-        db.query(DBDataFileTypePermission, DBDataFilePermission)
-        .join(DBDataFile)
-        .filter(
-            DBDataFileTypePermission.data_file_type == DBDataFile.type,
-            DBDataFilePermission.data_file_id == datafile_id,
-        )
-        .offset(skip)
-        .limit(limit)
-        .all()
-    )
+    datafile = db.query(DBDataFile).filter(DBDataFile.id == datafile_id).first()
+    if datafile:
+        filetype_perms = db.query(DBDataFileTypePermission).filter(
+            DBDataFileTypePermission.data_file_type == datafile.type
+        ).all()
+        datafile_perms = db.query(DBDataFilePermission).filter(
+            DBDataFilePermission.data_file_id == datafile_id
+        ).all()
+        return filetype_perms + datafile_perms
+    else:
+        return []
 
 
 def create_permission(
