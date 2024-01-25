@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session, relationship
 
 from saluki.dependencies.database import Base
 from saluki.enums import UserLevel
+from saluki.models import DBDataFileTypePermission, DBDataFilePermission
 from saluki.schemas.users import UserCreate, UserUpdate
 
 password_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -28,6 +29,10 @@ class DBUser(Base):
     filetype_permissions = relationship(
         "DBDataFileTypePermission", back_populates="user", cascade="all, delete-orphan"
     )
+
+    @property
+    def permissions(self) -> list[DBDataFileTypePermission | DBDataFilePermission]:
+        return self.datafile_permissions + self.filetype_permissions
 
     def set_password(self, password):
         self.password = password_context.hash(password)
