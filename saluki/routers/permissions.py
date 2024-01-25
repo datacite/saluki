@@ -3,12 +3,12 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from saluki.dependencies.database import get_database
 from saluki.enums import PermissionType
 from saluki.models.datafiles import list_datafile
-from saluki.models.users import list_user
 from saluki.models.permissions import (
     create_permission,
     get_permission_by_id_and_type,
     remove_permission,
 )
+from saluki.models.users import list_user
 from saluki.schemas.permissions import DataFilePermission, DataFileTypePermission
 
 permissions_router = APIRouter(

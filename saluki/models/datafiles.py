@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session, relationship
 
 from saluki.dependencies.database import Base
 from saluki.enums import DataFileStatus, DataFileType
-from saluki.models.permissions import DBDataFileTypePermission, DBDataFilePermission
+from saluki.models.permissions import DBDataFilePermission, DBDataFileTypePermission
 from saluki.schemas.datafiles import DataFileCreate, DataFileUpdate
 
 
@@ -23,12 +23,12 @@ class DBDataFile(Base):
     location = Column(String, nullable=True)
     doi = Column(String, nullable=True)
 
-    direct_permissions = relationship(
-        "DBDataFilePermission", back_populates="datafile"
-    )
+    direct_permissions = relationship("DBDataFilePermission", back_populates="datafile")
 
     type_permissions = relationship(
-        "DBDataFileTypePermission", back_populates="datafile", primaryjoin="DBDataFile.type == foreign(DBDataFileTypePermission.data_file_type)"
+        "DBDataFileTypePermission",
+        back_populates="datafile",
+        primaryjoin="DBDataFile.type == foreign(DBDataFileTypePermission.data_file_type)",
     )
 
     @property

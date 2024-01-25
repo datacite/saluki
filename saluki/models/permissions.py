@@ -15,13 +15,9 @@ class DBDataFilePermission(Base):
     user_id = Column(Integer, ForeignKey("users.id"), primary_key=True)
     data_file_id = Column(Integer, ForeignKey("datafiles.id"), primary_key=True)
 
-    user = relationship(
-        "DBUser", back_populates="datafile_permissions"
-    )
+    user = relationship("DBUser", back_populates="datafile_permissions")
 
-    datafile = relationship(
-        "DBDataFile", back_populates="direct_permissions"
-    )
+    datafile = relationship("DBDataFile", back_populates="direct_permissions")
 
     def __repr__(self):
         return f"<DBDataFilePermission(user_id={self.user_id}, data_file_id={self.data_file_id})>"
@@ -35,12 +31,12 @@ class DBDataFileTypePermission(Base):
     user_id = Column(Integer, ForeignKey("users.id"), primary_key=True)
     data_file_type = Column(Enum(DataFileType), primary_key=True)
 
-    user = relationship(
-        "DBUser", back_populates="filetype_permissions"
-    )
+    user = relationship("DBUser", back_populates="filetype_permissions")
 
     datafile = relationship(
-        "DBDataFile", back_populates="type_permissions", primaryjoin="foreign(DBDataFileTypePermission.data_file_type) == DBDataFile.type"
+        "DBDataFile",
+        back_populates="type_permissions",
+        primaryjoin="foreign(DBDataFileTypePermission.data_file_type) == DBDataFile.type",
     )
 
     def __repr__(self):

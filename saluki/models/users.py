@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session, relationship
 
 from saluki.dependencies.database import Base
 from saluki.enums import UserLevel
-from saluki.models.permissions import DBDataFileTypePermission, DBDataFilePermission
+from saluki.models.permissions import DBDataFilePermission, DBDataFileTypePermission
 from saluki.schemas.users import UserCreate, UserUpdate
 
 password_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
