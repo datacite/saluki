@@ -20,6 +20,9 @@ class DBDataFilePermission(Base):
         "DBUser", back_populates="datafile_permissions"
     )
 
+    def __repr__(self):
+        return f"<DBDataFilePermission(user_id={self.user_id}, data_file_id={self.data_file_id})>"
+
 
 class DBDataFileTypePermission(Base):
     """Allows a user access to a specific type of data file."""
@@ -32,6 +35,9 @@ class DBDataFileTypePermission(Base):
     user = relationship(
         "DBUser", back_populates="filetype_permissions"
     )
+
+    def __repr__(self):
+        return f"<DBDataFileTypePermission(user_id={self.user_id}, data_file_type={self.data_file_type})>"
 
 
 def get_permission_by_id_and_type(

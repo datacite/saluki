@@ -28,6 +28,9 @@ class DBDataFile(Base):
         """Generate a download link for the data file."""
         return self.location  # Temporary - replace with AWS SDK call later on
 
+    def __repr__(self):
+        return f"<DBDataFile(id={self.id}, slug={self.slug}, type={self.type}, status={self.status})>"
+
 
 def list_datafiles(*, db: Session, skip: int = 0, limit: int = 100) -> list[DBDataFile]:
     return db.query(DBDataFile).offset(skip).limit(limit).all()
