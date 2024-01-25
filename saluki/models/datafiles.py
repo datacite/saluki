@@ -1,9 +1,9 @@
-from fastapi.encoders import jsonable_encoder
 from sqlalchemy import Column, Date, Enum, Integer, String, Text
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, relationship
 
 from saluki.dependencies.database import Base
 from saluki.enums import DataFileStatus, DataFileType
+from saluki.models.permissions import DBDataFileTypePermission, DBDataFilePermission
 from saluki.schemas.datafiles import DataFileCreate, DataFileUpdate
 
 
@@ -22,6 +22,18 @@ class DBDataFile(Base):
     status = Column(Enum(DataFileStatus), nullable=False, index=True)
     location = Column(String, nullable=True)
     doi = Column(String, nullable=True)
+
+    direct_permissions = relationship(
+        "DBDataFilePermission", back_populates="datafile"
+    )
+
+    type_permissions = relationship(
+        "DBDataFileTypePermission", back_populates="datafile", primaryjoin="DBDataFile.type == foreign(DBDataFileTypePermission.data_file_type)"
+    )
+
+    @property
+    def permissions(self) -> list[DBDataFileTypePermission | DBDataFilePermission]:
+        return self.direct_permissions + self.type_permissions
 
     @property
     def download_link(self):
