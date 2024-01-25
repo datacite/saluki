@@ -64,41 +64,6 @@ def get_permission_by_id_and_type(
         )
 
 
-# def list_permissions_for_user(
-#     *, db: Session, user_id: int, skip: int = 0, limit: int = 100
-# ) -> list[DBDataFileTypePermission | DBDataFilePermission]:
-#
-#     filetype_perms = (db.query(DBDataFileTypePermission)
-#         .filter(
-#             DBDataFileTypePermission.user_id == user_id,
-#         )
-#     ).all()
-#
-#     datafile_perms = (db.query(DBDataFilePermission)
-#         .filter(
-#             DBDataFilePermission.user_id == user_id,
-#         )
-#     ).all()
-#
-#     return filetype_perms + datafile_perms
-#
-#
-# def list_permissions_for_datafile(
-#     *, db: Session, datafile_id: int, skip: int = 0, limit: int = 100
-# ) -> list[DBDataFileTypePermission | DBDataFilePermission]:
-#     datafile = db.query(DBDataFile).filter(DBDataFile.id == datafile_id).first()
-#     if datafile:
-#         filetype_perms = db.query(DBDataFileTypePermission).filter(
-#             DBDataFileTypePermission.data_file_type == datafile.type
-#         ).all()
-#         datafile_perms = db.query(DBDataFilePermission).filter(
-#             DBDataFilePermission.data_file_id == datafile_id
-#         ).all()
-#         return filetype_perms + datafile_perms
-#     else:
-#         return []
-
-
 def create_permission(
     *, db: Session, permission_dict: DataFileTypePermission | DataFilePermission
 ) -> DBDataFileTypePermission | DBDataFilePermission:

@@ -2,11 +2,11 @@ from fastapi import APIRouter, Depends, HTTPException, status
 
 from saluki.dependencies.database import get_database
 from saluki.enums import PermissionType
+from saluki.models.datafiles import list_datafile
+from saluki.models.users import list_user
 from saluki.models.permissions import (
     create_permission,
     get_permission_by_id_and_type,
-    list_permissions_for_datafile,
-    list_permissions_for_user,
     remove_permission,
 )
 from saluki.schemas.permissions import DataFilePermission, DataFileTypePermission
@@ -25,21 +25,25 @@ permissions_router = APIRouter(
     "/datafile/{data_file_id}",
     response_model=list[DataFilePermission | DataFileTypePermission],
 )
-def get_permissions_for_datafile(
-    data_file_id: int, db=Depends(get_database), skip: int = 0, limit: int = 100
-):
-    return list_permissions_for_datafile(
-        db=db, datafile_id=data_file_id, skip=skip, limit=limit
-    )
+def get_permissions_for_datafile(data_file_id: str, db=Depends(get_database)):
+    datafile = list_datafile(db=db, slug=data_file_id)
+    if not datafile:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Data file not found"
+        )
+    return datafile.permissions
 
 
 @permissions_router.get(
     "/user/{user_id}", response_model=list[DataFilePermission | DataFileTypePermission]
 )
-def get_permissions_for_user(
-    user_id: int, db=Depends(get_database), skip: int = 0, limit: int = 100
-):
-    return list_permissions_for_user(db=db, user_id=user_id, skip=skip, limit=limit)
+def get_permissions_for_user(user_id: str, db=Depends(get_database)):
+    user = list_user(db=db, email=user_id)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
+        )
+    return user.permissions
 
 
 @permissions_router.post(
