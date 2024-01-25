@@ -1,4 +1,4 @@
 """SQLAlchemy models."""
-from .datafiles import *
-from .permissions import *
-from .users import *
+from saluki.models.datafiles import *
+from saluki.models.permissions import *
+from saluki.models.users import *
