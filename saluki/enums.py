@@ -1,4 +1,4 @@
-from enum import Enum
+from enum import Enum, IntEnum
 
 
 class DataFileType(Enum):
@@ -10,7 +10,7 @@ class DataFileType(Enum):
     other = "Other"
 
 
-class UserLevel(Enum):
+class UserLevel(IntEnum):
     """The user level."""
 
     anonymous = 0
