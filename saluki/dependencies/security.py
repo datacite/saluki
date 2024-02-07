@@ -8,7 +8,7 @@ from saluki.models import get_user_by_email, DBUser
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token", auto_error=False)
 
 
-def get_current_user(db=Depends(get_database), token=Depends(oauth2_scheme)):
+def get_current_user(db=Depends(get_database), token=Depends(oauth2_scheme)) -> DBUser:
     user = get_user_by_email(db=db, email=token)
     if user:
         if user.is_active:
