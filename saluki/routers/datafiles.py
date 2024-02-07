@@ -29,7 +29,7 @@ datafile_router = APIRouter(
 
 @datafile_router.get("/", response_model=list[DataFile])
 def get_datafiles(skip: int = 0, limit: int = 100, db=Depends(get_database), current_user=Depends(get_current_user)):
-    if current_user.user_level >= UserLevel.staff:
+    if current_user.user_level >= UserLevel.editor:
         return list_datafiles(db=db, skip=skip, limit=limit)
     elif current_user.user_level == UserLevel.anonymous:
         # Need to think about this - three possible options:
