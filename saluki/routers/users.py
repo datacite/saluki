@@ -26,7 +26,7 @@ def get_users(skip: int = 0, limit: int = 100, db=Depends(get_database)):
     return list_users(db=db, skip=skip, limit=limit)
 
 
-@user_router.get("/{user_id}", response_model=UserInDB)
+@user_router.get("/{user_id}", response_model=User)
 def get_user(user_id: str, db=Depends(get_database)):
     db_user = list_user(db=db, email=user_id)
     if not db_user:
