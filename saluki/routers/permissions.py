@@ -37,7 +37,9 @@ def get_permissions_for_datafile(data_file_id: str, db=Depends(get_database)):
 
 
 @permissions_router.get(
-    "/user/{user_id}", response_model=list[DataFilePermission | DataFileTypePermission], dependencies=[Depends(AccessLevelChecker(UserLevel.staff))]
+    "/user/{user_id}",
+    response_model=list[DataFilePermission | DataFileTypePermission],
+    dependencies=[Depends(AccessLevelChecker(UserLevel.staff))],
 )
 def get_permissions_for_user(user_id: str, db=Depends(get_database)):
     user = list_user(db=db, email=user_id)
@@ -55,16 +57,19 @@ def get_permissions_for_user(user_id: str, db=Depends(get_database)):
     dependencies=[Depends(AccessLevelChecker(UserLevel.staff))],
 )
 def post_permission(
-        permission: DataFilePermission | DataFileTypePermission, db=Depends(get_database),
+    permission: DataFilePermission | DataFileTypePermission,
+    db=Depends(get_database),
 ):
     return create_permission(db=db, permission_dict=permission)
 
 
 @permissions_router.delete(
-    "/{permission_type}/{permission_id}", status_code=status.HTTP_204_NO_CONTENT, dependencies=[Depends(AccessLevelChecker(UserLevel.staff))]
+    "/{permission_type}/{permission_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    dependencies=[Depends(AccessLevelChecker(UserLevel.staff))],
 )
 def delete_permission(
-        permission_type: PermissionType, permission_id: int, db=Depends(get_database)
+    permission_type: PermissionType, permission_id: int, db=Depends(get_database)
 ):
     permission = get_permission_by_id_and_type(
         db=db, permission_id=permission_id, permission_type=permission_type
