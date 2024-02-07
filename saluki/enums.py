@@ -14,7 +14,7 @@ class UserLevel(IntEnum):
     """The user level."""
 
     anonymous = 0
-    user = 1  # Can read data files
+    user = 1  # Can read data files as defined by permissions
     editor = 2  # Can create and edit data files
     staff = 3  # Can edit users and permissions
     admin = 4  # Can do everything
