@@ -34,6 +34,10 @@ class DBUser(Base):
     def permissions(self) -> list[DBDataFileTypePermission | DBDataFilePermission]:
         return self.datafile_permissions + self.filetype_permissions
 
+    @property
+    def datafiles(self):
+        return [permission.datafile for permission in self.permissions]
+
     def __repr__(self):
         return f"<DBUser(id={self.id}, email={self.email}, name={self.name}, user_level={self.user_level})>"
 
