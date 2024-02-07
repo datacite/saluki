@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session, relationship
 
 from saluki.dependencies.database import Base
 from saluki.enums import UserLevel
+from saluki.models import DBDataFile
 from saluki.models.permissions import DBDataFilePermission, DBDataFileTypePermission
 from saluki.schemas.users import UserCreate, UserUpdate
 
@@ -35,7 +36,7 @@ class DBUser(Base):
         return self.datafile_permissions + self.filetype_permissions
 
     @property
-    def datafiles(self):
+    def datafiles(self) -> list[DBDataFile]:
         return [permission.datafile for permission in self.permissions]
 
     def __repr__(self):
