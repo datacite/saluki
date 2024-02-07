@@ -73,6 +73,9 @@ def update_user(*, db: Session, user: DBUser, user_dict: UserUpdate) -> DBUser:
     if user_dict.password:
         user.set_password(user_dict.password)
 
+    if user_dict.user_level:
+        user.user_level = user_dict.user_level
+
     db.commit()
     db.refresh(user)
     return user
