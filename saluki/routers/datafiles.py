@@ -42,13 +42,18 @@ def get_datafiles(skip: int = 0, limit: int = 100, db=Depends(get_database), cur
 
 
 @datafile_router.get("/{datafile_id}", response_model=DataFile)
-def get_datafile(datafile_id: str, db=Depends(get_database)):
+def get_datafile(datafile_id: str, db=Depends(get_database), current_user=Depends(get_current_user)):
     db_datafile = list_datafile(db=db, slug=datafile_id)
     if not db_datafile:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Data File not found"
         )
-    return db_datafile
+    if current_user.user_level >= UserLevel.editor or db_datafile in current_user.datafiles:
+        return db_datafile
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, detail="Insufficient permissions"
+        )
 
 
 @datafile_router.post("/", response_model=DataFile, status_code=status.HTTP_201_CREATED)
