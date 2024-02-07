@@ -3,16 +3,20 @@ from fastapi.security import OAuth2PasswordBearer
 
 from saluki.dependencies.database import get_database
 from saluki.enums import UserLevel
-from saluki.models import get_user_by_email
+from saluki.models import get_user_by_email, DBUser
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token", auto_error=False)
 
 
 def get_current_user(db=Depends(get_database), token=Depends(oauth2_scheme)):
     user = get_user_by_email(db=db, email=token)
-    if user and not user.is_active:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Inactive user")
-    return user
+    if user:
+        if user.is_active:
+            return user
+        else:
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Inactive user")
+    else:
+        return DBUser(name="Anonymous", user_level=UserLevel.anonymous, is_active=True)
 
 
 class AccessLevelChecker:
