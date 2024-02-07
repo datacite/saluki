@@ -31,4 +31,6 @@ class UserInDB(UserBase):
 
 # Extra properties to return via API
 class User(UserBase):
-    pass
+    id: int
+    user_level: UserLevel
+    is_active: bool
