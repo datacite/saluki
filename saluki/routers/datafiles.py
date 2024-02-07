@@ -1,6 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 
 from saluki.dependencies.database import get_database
+from saluki.dependencies.security import get_current_user
+from saluki.enums import UserLevel
 from saluki.models.datafiles import (
     create_datafile,
     list_datafile,
@@ -26,8 +28,17 @@ datafile_router = APIRouter(
 
 
 @datafile_router.get("/", response_model=list[DataFile])
-def get_datafiles(skip: int = 0, limit: int = 100, db=Depends(get_database)):
-    return list_datafiles(db=db, skip=skip, limit=limit)
+def get_datafiles(skip: int = 0, limit: int = 100, db=Depends(get_database), current_user=Depends(get_current_user)):
+    if current_user.user_level >= UserLevel.staff:
+        return list_datafiles(db=db, skip=skip, limit=limit)
+    elif current_user.user_level == UserLevel.anonymous:
+        # Need to think about this - three possible options:
+        # 1. Bring back the is_public attribute on the DataFile model
+        # 2. Add an Anonymous user to the DB, so it can be granted permissions using the normal flow
+        # 3. Define in code the types of data files that can be accessed by an Anonymous user and use a different DB query
+        return []
+    else:
+        return current_user.datafiles
 
 
 @datafile_router.get("/{datafile_id}", response_model=DataFile)
