@@ -19,7 +19,7 @@ class UserCreate(UserBase):
 # Extra properties to receive via API on update
 class UserUpdate(UserBase):
     password: Optional[str] = None
-    user_level: Optional[UserLevel]
+    user_level: Optional[UserLevel] = None
 
 
 # Extra properties stored in DB

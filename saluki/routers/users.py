@@ -78,7 +78,7 @@ def put_user(
         )
     if current_user == db_user or current_user.user_level >= UserLevel.staff:
         # Don't let a level be increased higher than the level below the current user
-        if user.user_level >= current_user.user_level:
+        if user.user_level and user.user_level >= current_user.user_level:
             user.user_level = None
         db_user = update_user(db=db, user=db_user, user_dict=user)
         return db_user
