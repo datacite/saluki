@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 
 from saluki.dependencies.database import get_database
-from saluki.dependencies.security import get_current_user
+from saluki.dependencies.security import get_current_user, AccessLevelChecker
 from saluki.enums import UserLevel
 from saluki.models.datafiles import (
     create_datafile,
@@ -56,14 +56,14 @@ def get_datafile(datafile_id: str, db=Depends(get_database), current_user=Depend
         )
 
 
-@datafile_router.post("/", response_model=DataFile, status_code=status.HTTP_201_CREATED)
+@datafile_router.post("/", response_model=DataFile, status_code=status.HTTP_201_CREATED, dependencies=[Depends(AccessLevelChecker(UserLevel.editor))])
 def post_datafile(datafile: DataFileCreate, db=Depends(get_database)):
     db_datafile = create_datafile(db=db, datafile_dict=datafile)
     return db_datafile
 
 
 @datafile_router.put(
-    "/{datafile_id}", response_model=DataFile, status_code=status.HTTP_200_OK
+    "/{datafile_id}", response_model=DataFile, status_code=status.HTTP_200_OK, dependencies=[Depends(AccessLevelChecker(UserLevel.editor))]
 )
 def put_datafile(datafile_id: str, datafile: DataFileUpdate, db=Depends(get_database)):
     db_datafile = get_datafile(db=db, slug=datafile_id)
@@ -75,7 +75,7 @@ def put_datafile(datafile_id: str, datafile: DataFileUpdate, db=Depends(get_data
     return db_datafile
 
 
-@datafile_router.delete("/{datafile_id}", status_code=status.HTTP_204_NO_CONTENT)
+@datafile_router.delete("/{datafile_id}", status_code=status.HTTP_204_NO_CONTENT, dependencies=[Depends(AccessLevelChecker(UserLevel.editor))])
 def delete_datafile(datafile_id: str, db=Depends(get_database)):
     db_datafile = get_datafile(db=db, slug=datafile_id)
     if not db_datafile:
