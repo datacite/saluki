@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, status
-
+from fastapi.responses import RedirectResponse
 from saluki.dependencies.database import get_database
 from saluki.dependencies.security import AccessLevelChecker, get_current_user
 from saluki.enums import UserLevel
@@ -107,7 +107,7 @@ def delete_datafile(datafile_id: str, db=Depends(get_database)):
     return remove_datafile(db=db, datafile=db_datafile)
 
 
-@datafile_router.get("/{datafile_id}/download")
+@datafile_router.get("/{datafile_id}/download", response_class=RedirectResponse)
 def download_datafile(datafile_id: str, db=Depends(get_database), current_user=Depends(get_current_user)):
     db_datafile = list_datafile(db=db, slug=datafile_id)
     if not db_datafile:
@@ -118,7 +118,7 @@ def download_datafile(datafile_id: str, db=Depends(get_database), current_user=D
             current_user.user_level >= UserLevel.editor
             or db_datafile in current_user.datafiles
     ):
-        return {"link": db_datafile.download_link}
+        return db_datafile.download_link
     else:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN, detail="Insufficient permissions"
