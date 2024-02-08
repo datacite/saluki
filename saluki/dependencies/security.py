@@ -18,7 +18,8 @@ def get_current_user(db=Depends(get_database), token=Depends(oauth2_scheme)) -> 
         try:
             payload = jwt.decode(token, settings.secret_key, algorithms=["HS256"])
             email: str = payload.get("sub")
-            if email is None:
+            action: str = payload.get("action")
+            if email is None or action != "api":
                 raise HTTPException(
                     status_code=status.HTTP_401_UNAUTHORIZED,
                     detail="Invalid token",
@@ -66,6 +67,13 @@ class AccessLevelChecker:
 
 def create_access_token(user: DBUser):
     expire = datetime.utcnow() + timedelta(minutes=settings.jwt_expire_minutes)
-    data = {"sub": user.email, "exp": expire}
+    data = {"sub": user.email, "action": "api", "exp": expire}
+    encoded_jwt = jwt.encode(data, settings.secret_key, algorithm="HS256")
+    return encoded_jwt
+
+
+def create_verification_token(user: DBUser):
+    expire = datetime.utcnow() + timedelta(minutes=settings.confirmation_expire_minutes)
+    data = {"sub": user.email, "action": "confirm", "exp": expire}
     encoded_jwt = jwt.encode(data, settings.secret_key, algorithm="HS256")
     return encoded_jwt
