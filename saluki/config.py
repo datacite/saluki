@@ -7,3 +7,6 @@ class Settings(BaseSettings):
     jwt_expire_minutes: int = 1440
 
     model_config = SettingsConfigDict(env_file=".env")
+
+
+settings = Settings()
