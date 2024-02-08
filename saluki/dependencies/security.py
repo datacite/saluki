@@ -13,6 +13,29 @@ from saluki.config import settings
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token", auto_error=False)
 
 
+def get_token_user(token=Depends(oauth2_scheme), action: str = None) -> str | None:
+    if token:
+        try:
+            payload = jwt.decode(token, settings.secret_key, algorithms=["HS256"])
+            email: str = payload.get("sub")
+            token_action: str = payload.get("action")
+            if email is None or token_action != action:
+                raise HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    detail="Invalid token",
+                    headers={"WWW-Authenticate": "Bearer"},
+                )
+        except JWTError:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid token",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
+        return email
+    else:
+        return None
+
+
 def get_current_user(db=Depends(get_database), token=Depends(oauth2_scheme)) -> DBUser:
     if token:
         try:
