@@ -105,3 +105,12 @@ def delete_datafile(datafile_id: str, db=Depends(get_database)):
             status_code=status.HTTP_404_NOT_FOUND, detail="Data File not found"
         )
     return remove_datafile(db=db, datafile=db_datafile)
+
+
+def download_datafile(datafile_id: str, db=Depends(get_database())):
+    db_datafile = get_datafile(db=db, slug=datafile_id)
+    if not db_datafile:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Data File not found"
+        )
+    return {"link": db_datafile.download_link}
