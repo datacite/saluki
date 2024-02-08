@@ -14,6 +14,7 @@ from saluki.dependencies.security import (
 )
 from saluki.enums import UserLevel
 from saluki.models import get_user_by_email
+from saluki.utils.email import send_email
 
 app = FastAPI()
 
@@ -49,6 +50,5 @@ def login(
 @app.get("/test", dependencies=[Depends(AccessLevelChecker(UserLevel.user))])
 def test(user=Depends(get_current_user)):
     return {
-        "message": f"User {user.name} allowed!",
-        "permissions": [d.slug for d in user.datafiles],
+        "response": send_email(user.email, "test mailgun email", "test body"),
     }
