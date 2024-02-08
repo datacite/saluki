@@ -9,7 +9,7 @@ from saluki.models.users import (
     list_user,
     list_users,
     remove_user,
-    update_user,
+    update_user, activate_user,
 )
 from saluki.schemas.users import User, UserCreate, UserInDB, UserUpdate
 
@@ -100,3 +100,15 @@ def delete_user(user_id: str, db=Depends(get_database)):
             status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
         )
     return remove_user(db=db, user=db_user)
+
+
+@user_router.get("/confirm")
+def confirm_user(token: str, db=Depends(get_database)):
+    token_user = get_token_user(token=token, action="confirm")
+    db_user = list_user(db=db, email=token_user)
+    if not db_user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
+        )
+    activate_user(db=db, user=db_user)
+    return True
