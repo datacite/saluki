@@ -1,7 +1,7 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Request
 
 from saluki.dependencies.database import get_database
-from saluki.dependencies.security import AccessLevelChecker, get_current_user, get_token_user
+from saluki.dependencies.security import AccessLevelChecker, get_current_user, get_token_user, create_verification_token
 from saluki.enums import UserLevel
 from saluki.models.users import (
     create_user,
@@ -13,6 +13,7 @@ from saluki.models.users import (
 )
 from saluki.schemas.users import User, UserCreate, UserInDB, UserUpdate
 from saluki.utils.email import send_confirmation_email
+
 
 user_router = APIRouter(
     prefix="/users",
@@ -31,6 +32,21 @@ user_router = APIRouter(
 )
 def get_users(skip: int = 0, limit: int = 100, db=Depends(get_database)):
     return list_users(db=db, skip=skip, limit=limit)
+
+
+@user_router.get("/confirm")
+def confirm_user(token: str, db=Depends(get_database)):
+    token_user = get_token_user(token=token, action="confirm")
+    db_user = list_user(db=db, email=token_user)
+    if not db_user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
+        )
+    success = activate_user(db=db, user=db_user)
+    if success:
+        return {"message": "User activated successfully"}
+    else:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Failed to activate user")
 
 
 @user_router.get(
@@ -55,9 +71,12 @@ def get_user(
 
 
 @user_router.post("/", response_model=User, status_code=status.HTTP_201_CREATED)
-def post_user(user: UserCreate, db=Depends(get_database)):
+def post_user(request: Request, user: UserCreate, db=Depends(get_database)):
     db_user = create_user(db=db, user_dict=user)
-    send_confirmation_email(db_user)
+    confirmation_token = create_verification_token(db_user)
+    confirmation_url = request.url_for("confirm_user").include_query_params(token=confirmation_token)
+    send_confirmation_email(db_user, confirmation_url)
+
     return db_user
 
 
@@ -102,15 +121,3 @@ def delete_user(user_id: str, db=Depends(get_database)):
             status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
         )
     return remove_user(db=db, user=db_user)
-
-
-@user_router.get("/confirm")
-def confirm_user(token: str, db=Depends(get_database)):
-    token_user = get_token_user(token=token, action="confirm")
-    db_user = list_user(db=db, email=token_user)
-    if not db_user:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
-        )
-    activate_user(db=db, user=db_user)
-    return True
