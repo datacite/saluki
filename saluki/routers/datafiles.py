@@ -107,7 +107,8 @@ def delete_datafile(datafile_id: str, db=Depends(get_database)):
     return remove_datafile(db=db, datafile=db_datafile)
 
 
-def download_datafile(datafile_id: str, db=Depends(get_database())):
+@datafile_router.get("/{datafile_id}/download")
+def download_datafile(datafile_id: str, db=Depends(get_database)):
     db_datafile = get_datafile(db=db, slug=datafile_id)
     if not db_datafile:
         raise HTTPException(
