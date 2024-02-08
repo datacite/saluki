@@ -67,5 +67,5 @@ class AccessLevelChecker:
 def create_access_token(user: DBUser):
     expire = datetime.utcnow() + timedelta(minutes=settings.jwt_expire_minutes)
     data = {"sub": user.email, "exp": expire}
-    encoded_jwt = jwt.encode(data, settings.secret_key, algorithm=["HS256"])
+    encoded_jwt = jwt.encode(data, settings.secret_key, algorithm="HS256")
     return encoded_jwt
