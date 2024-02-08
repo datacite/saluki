@@ -1,7 +1,9 @@
 from datetime import datetime, timedelta, timezone
+
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
+
 from saluki.dependencies.database import get_database
 from saluki.enums import UserLevel
 from saluki.models import DBUser, get_user_by_email
@@ -21,12 +23,16 @@ def get_current_user(db=Depends(get_database), token=Depends(oauth2_scheme)) -> 
             email: str = payload.get("sub")
             if email is None:
                 raise HTTPException(
-                    status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token", headers={"WWW-Authenticate": "Bearer"},
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    detail="Invalid token",
+                    headers={"WWW-Authenticate": "Bearer"},
                 )
         except JWTError:
             raise HTTPException(
-                    status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token", headers={"WWW-Authenticate": "Bearer"},
-                )
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid token",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
 
         user = get_user_by_email(db=db, email=email)
         if user:

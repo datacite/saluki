@@ -44,7 +44,12 @@ class DBDataFile(Base):
             s3_client = boto3.client("s3")
             try:
                 url = s3_client.generate_presigned_url(
-                    ClientMethod="get_object", Params={"Bucket": "pidgraph-data-dumps", "Key": self.location.rsplit("/", 1)[-1]}, ExpiresIn=3600
+                    ClientMethod="get_object",
+                    Params={
+                        "Bucket": "pidgraph-data-dumps",
+                        "Key": self.location.rsplit("/", 1)[-1],
+                    },
+                    ExpiresIn=3600,
                 )
                 return url
             except ClientError as e:

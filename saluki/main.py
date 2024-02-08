@@ -7,7 +7,11 @@ from routers.permissions import permissions_router
 from routers.users import user_router
 
 from saluki.dependencies.database import get_database
-from saluki.dependencies.security import AccessLevelChecker, get_current_user, create_access_token
+from saluki.dependencies.security import (
+    AccessLevelChecker,
+    create_access_token,
+    get_current_user,
+)
 from saluki.enums import UserLevel
 from saluki.models import get_user_by_email
 
