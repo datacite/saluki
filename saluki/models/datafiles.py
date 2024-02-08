@@ -1,3 +1,5 @@
+import boto3
+from botocore.exceptions import ClientError
 from sqlalchemy import Column, Date, Enum, Integer, String, Text
 from sqlalchemy.orm import Session, relationship
 
@@ -38,7 +40,19 @@ class DBDataFile(Base):
     @property
     def download_link(self):
         """Generate a download link for the data file."""
-        return self.location  # Temporary - replace with AWS SDK call later on
+        if self.location[:3] == "s3:":
+            s3_client = boto3.client("s3")
+            try:
+                url = s3_client.generate_presigned_url(
+                    ClientMethod="get_object", Params={"Bucket": "pidgraph-data-dumps", "Key": self.location.rsplit("/", 1)[-1]}, ExpiresIn=3600
+                )
+                return url
+            except ClientError as e:
+                # TODO: Add some logging here
+                print(f"Couldn't generate presigned URL: {e}")
+                return None
+        else:
+            return self.location
 
     def __repr__(self):
         return f"<DBDataFile(id={self.id}, slug={self.slug}, type={self.type}, status={self.status})>"
