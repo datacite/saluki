@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta
 
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
@@ -13,7 +13,7 @@ from saluki.config import settings
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token", auto_error=False)
 
 
-def get_token_user(token=Depends(oauth2_scheme), action: str = None) -> str | None:
+def get_token_user(token: str, action: str = None) -> str | None:
     if token:
         try:
             payload = jwt.decode(token, settings.secret_key, algorithms=["HS256"])
