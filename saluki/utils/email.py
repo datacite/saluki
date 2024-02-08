@@ -1,6 +1,6 @@
-from saluki.config import settings
 import httpx
 
+from saluki.config import settings
 
 CONFIRMATION_EMAIL_TEMPLATE = """
 Dear {name},

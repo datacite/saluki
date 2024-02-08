@@ -1,19 +1,24 @@
-from fastapi import APIRouter, Depends, HTTPException, status, Request
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 
 from saluki.dependencies.database import get_database
-from saluki.dependencies.security import AccessLevelChecker, get_current_user, get_token_user, create_verification_token
+from saluki.dependencies.security import (
+    AccessLevelChecker,
+    create_verification_token,
+    get_current_user,
+    get_token_user,
+)
 from saluki.enums import UserLevel
 from saluki.models.users import (
+    activate_user,
     create_user,
     get_user_by_email,
     list_user,
     list_users,
     remove_user,
-    update_user, activate_user,
+    update_user,
 )
 from saluki.schemas.users import User, UserCreate, UserInDB, UserUpdate
 from saluki.utils.email import send_confirmation_email
-
 
 user_router = APIRouter(
     prefix="/users",
@@ -46,7 +51,9 @@ def confirm_user(token: str, db=Depends(get_database)):
     if success:
         return {"message": "User activated successfully"}
     else:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Failed to activate user")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Failed to activate user"
+        )
 
 
 @user_router.get(
@@ -74,7 +81,9 @@ def get_user(
 def post_user(request: Request, user: UserCreate, db=Depends(get_database)):
     db_user = create_user(db=db, user_dict=user)
     confirmation_token = create_verification_token(db_user)
-    confirmation_url = request.url_for("confirm_user").include_query_params(token=confirmation_token)
+    confirmation_url = request.url_for("confirm_user").include_query_params(
+        token=confirmation_token
+    )
     send_confirmation_email(db_user, confirmation_url)
 
     return db_user

@@ -4,11 +4,10 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
 
+from saluki.config import settings
 from saluki.dependencies.database import get_database
 from saluki.enums import UserLevel
 from saluki.models import DBUser, get_user_by_email
-
-from saluki.config import settings
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token", auto_error=False)
 
