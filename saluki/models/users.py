@@ -103,10 +103,7 @@ def authenticate_user(*, db: Session, email: str, password: str) -> DBUser | Non
     return user
 
 
-def confirm_user(*, db: Session, email: str, confirmation_token: str) -> bool:
-    user = get_user_by_email(db=db, email=email)
-    if not user:
-        return False
+def activate_user(*, db: Session, user: DBUser) -> bool:
     user.is_active = True
     db.commit()
     db.refresh(user)
