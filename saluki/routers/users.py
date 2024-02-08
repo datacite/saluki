@@ -12,6 +12,7 @@ from saluki.models.users import (
     update_user, activate_user,
 )
 from saluki.schemas.users import User, UserCreate, UserInDB, UserUpdate
+from saluki.utils.email import send_confirmation_email
 
 user_router = APIRouter(
     prefix="/users",
@@ -56,6 +57,7 @@ def get_user(
 @user_router.post("/", response_model=User, status_code=status.HTTP_201_CREATED)
 def post_user(user: UserCreate, db=Depends(get_database)):
     db_user = create_user(db=db, user_dict=user)
+    send_confirmation_email(db_user)
     return db_user
 
 
