@@ -1,6 +1,6 @@
 from typing import Annotated
 
-from fastapi import Depends, FastAPI, HTTPException, status
+from fastapi import Depends, FastAPI, HTTPException, status, Request
 from fastapi.security import OAuth2PasswordRequestForm
 from routers.datafiles import datafile_router
 from routers.permissions import permissions_router
@@ -43,6 +43,11 @@ def login(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Incorrect username or password",
         )
+    if not user.is_active:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="User is not active",
+        )
 
     return {"access_token": create_access_token(user=user), "token_type": "bearer"}
 
@@ -52,3 +57,11 @@ def test(user=Depends(get_current_user)):
     return {
         "response": send_email(user.email, "test mailgun email", "test body"),
     }
+
+
+@app.get("/routes")
+def get_routes(request: Request):
+    url_list = [
+        {"path": route.path, "name": route.name} for route in request.app.routes
+    ]
+    return url_list
