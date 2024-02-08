@@ -15,25 +15,30 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 1440
 
 
 def get_current_user(db=Depends(get_database), token=Depends(oauth2_scheme)) -> DBUser:
-    try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        email: str = payload.get("sub")
-        if email is None:
+    if token:
+        try:
+            payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+            email: str = payload.get("sub")
+            if email is None:
+                raise HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token", headers={"WWW-Authenticate": "Bearer"},
+                )
+        except JWTError:
             raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token", headers={"WWW-Authenticate": "Bearer"},
-            )
-    except JWTError:
-        raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token", headers={"WWW-Authenticate": "Bearer"},
-            )
+                    status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token", headers={"WWW-Authenticate": "Bearer"},
+                )
 
-    user = get_user_by_email(db=db, email=email)
-    if user:
-        if user.is_active:
-            return user
+        user = get_user_by_email(db=db, email=email)
+        if user:
+            if user.is_active:
+                return user
+            else:
+                raise HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED, detail="Inactive user"
+                )
         else:
             raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED, detail="Inactive user"
+                status_code=status.HTTP_401_UNAUTHORIZED, detail="User not found"
             )
     else:
         return DBUser(name="Anonymous", user_level=UserLevel.anonymous, is_active=True)
