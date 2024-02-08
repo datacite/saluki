@@ -21,7 +21,7 @@ class DBUser(Base):
     email = Column(String, nullable=False, unique=True, index=True)
     name = Column(String, nullable=True)
     password = Column(String, nullable=False)
-    user_level = Column(Enum(UserLevel), nullable=False, default=0)
+    user_level = Column(Enum(UserLevel), nullable=False, default=1)
     is_active = Column(Boolean, default=False)
 
     datafile_permissions = relationship(
@@ -45,7 +45,7 @@ class DBUser(Base):
     def set_password(self, password):
         self.password = password_context.hash(password)
 
-    def verify_password(self, password):
+    def verify_password(self, password) -> bool:
         return password_context.verify(password, self.password)
 
 
