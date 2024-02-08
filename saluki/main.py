@@ -7,7 +7,7 @@ from routers.permissions import permissions_router
 from routers.users import user_router
 
 from saluki.dependencies.database import get_database
-from saluki.dependencies.security import AccessLevelChecker, get_current_user
+from saluki.dependencies.security import AccessLevelChecker, get_current_user, create_access_token
 from saluki.enums import UserLevel
 from saluki.models import get_user_by_email
 
@@ -39,7 +39,7 @@ def login(
             detail="Incorrect username or password",
         )
 
-    return {"access_token": user.email, "token_type": "bearer"}
+    return {"access_token": create_access_token(user=user), "token_type": "bearer"}
 
 
 @app.get("/test", dependencies=[Depends(AccessLevelChecker(UserLevel.user))])
