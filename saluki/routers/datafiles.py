@@ -108,10 +108,18 @@ def delete_datafile(datafile_id: str, db=Depends(get_database)):
 
 
 @datafile_router.get("/{datafile_id}/download")
-def download_datafile(datafile_id: str, db=Depends(get_database)):
-    db_datafile = get_datafile(db=db, slug=datafile_id)
+def download_datafile(datafile_id: str, db=Depends(get_database), current_user=Depends(get_current_user)):
+    db_datafile = list_datafile(db=db, slug=datafile_id)
     if not db_datafile:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Data File not found"
         )
-    return {"link": db_datafile.download_link}
+    if (
+            current_user.user_level >= UserLevel.editor
+            or db_datafile in current_user.datafiles
+    ):
+        return {"link": db_datafile.download_link}
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, detail="Insufficient permissions"
+        )
