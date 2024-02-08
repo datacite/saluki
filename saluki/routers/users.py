@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 
 from saluki.dependencies.database import get_database
-from saluki.dependencies.security import AccessLevelChecker, get_current_user
+from saluki.dependencies.security import AccessLevelChecker, get_current_user, get_token_user
 from saluki.enums import UserLevel
 from saluki.models.users import (
     create_user,
